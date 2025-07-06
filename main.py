@@ -1,13 +1,32 @@
 import os
+from utils.nlp_utils import extract_nouns_and_phrases
 from parsers.resume_parser import parse_resume
-from parsers.jd_parser import parse_jd
-from embeddings.embedder import calculate_similarity
-from genai.skill_extractor import extract_skills_with_experience
+from genai.skill_extractor import (
+    extract_skills_with_experience,
+    extract_skills_from_noun_phrases
+)
 
-# Load JD text
-jd_text = parse_jd("data/jd.txt")
+def calculate_normalized_score(resume_skills, jd_skills):
+    jd_skill_set = set(s.lower() for s in jd_skills)
+    resume_skill_set = set(s["skill"].lower() for s in resume_skills)
 
-# Resume folder
+    matched_skills = jd_skill_set.intersection(resume_skill_set)
+
+    if not jd_skill_set:
+        return 0.0, set()
+
+    score = (len(matched_skills) / len(jd_skill_set)) * 100
+    return round(score, 2), matched_skills
+
+# --- Load JD and extract skills ---
+with open("data/jd.txt", "r", encoding="utf-8") as f:
+    jd_text = f.read()
+
+jd_noun_phrases = extract_nouns_and_phrases(jd_text)
+jd_skills = extract_skills_from_noun_phrases(jd_noun_phrases, jd_text)
+jd_skill_set = set(s.lower() for s in jd_skills)
+
+# --- Process Resumes ---
 resume_folder = "data/resumes"
 results = []
 
@@ -21,39 +40,27 @@ for filename in os.listdir(resume_folder):
         nouns_phrases = resume.get("nouns_phrases", [])
         resume_text_blob = f"{resume.get('name', '')} {resume.get('email', '')} {resume.get('experience', '')}"
 
-        # Use GenAI to extract skills with experience
         skills = extract_skills_with_experience(nouns_phrases, resume_text_blob)
         resume["skills"] = skills
 
-        # Join skill names only for similarity calculation
-        skill_str = " ".join(s["skill"] for s in skills) if isinstance(skills, list) else ""
-
-        # Combine into full resume text
-        resume_text = f"{name} {email} {skill_str} {resume.get('experience', '')}"
-
-        similarity = calculate_similarity(resume_text, jd_text)
+        score, matched_skills = calculate_normalized_score(skills, jd_skills)
 
         results.append({
             "name": name,
             "email": email,
             "skills": skills,
-            "nouns_phrases": resume.get("nouns_phrases", []),
-            "score": similarity
+            "matched_skills": matched_skills,
+            "score": score
         })
 
-# Sort by similarity score
+# --- Print Output ---
 ranked = sorted(results, key=lambda x: x["score"], reverse=True)
 
-# Print output
-print("\n📝 Ranked Resumes:")
+print("JD Skills Required:")
+print(", ".join(sorted(jd_skill_set)))
+print("\n📝 Ranked Candidates:\n")
+
 for i, res in enumerate(ranked, 1):
-    print(f"{i}. {res['name']} | Score: {res['score']}")
-    print(f"   Email: {res['email']}")
-
-    if res['skills']:
-        for s in res['skills']:
-            print(f"   - {s['skill']} ({s['experience']})")
-    else:
-        print("   Skills: Not detected")
-
-    print(f"   Phrases: {', '.join(res['nouns_phrases'][:10])} ...\n")
+    print(f"{i}. {res['name']}")
+    print(f"   Matched Skills: {', '.join(sorted(res['matched_skills'])) or 'None'}")
+    print(f"   Score: {res['score']} / 100\n")

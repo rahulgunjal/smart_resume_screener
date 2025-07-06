@@ -1,5 +1,6 @@
 import os
 import docx
+import re
 
 def read_jd_docx(file_path):
     text = ""
@@ -19,12 +20,16 @@ def read_jd_txt(file_path):
         print(f"Error reading JD TXT: {e}")
         return ""
 
-def parse_jd(file_path):
-    ext = os.path.splitext(file_path)[-1].lower()
+def parse_jd(filepath):
+    with open(filepath, "r", encoding="utf-8") as f:
+        text = f.read()
 
-    if ext == ".docx":
-        return read_jd_docx(file_path)
-    elif ext == ".txt":
-        return read_jd_txt(file_path)
-    else:
-        raise ValueError("Unsupported JD file type. Only DOCX and TXT are supported.")
+    # Extract keywords (basic filtering)
+    text = text.lower()
+    words = re.findall(r"\b[a-zA-Z][a-zA-Z0-9\+\#\.]{1,}\b", text)
+    keywords = set(word for word in words if len(word) > 2)
+
+    return {
+        "raw": text,
+        "skills": list(keywords)
+    }

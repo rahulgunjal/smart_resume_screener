@@ -1,96 +1,173 @@
-# 💼 Smart Resume Screener & Matching Agent (GenAI + RAG + Multi-Agent Reasoning)
+# 📄 Smart Resume Screener & Matching Agent (GenAI + RAG)
 
-This is an intelligent resume screening system designed to **match resumes to job descriptions** using modern NLP, embeddings, and GenAI (Google Gemini). It demonstrates real-world AI automation skills by building an agent that can:
+This project is a **smart AI-based resume screener** that uses **Generative AI (Gemini)** and **NLP** to automatically:
 
-✅ Parse resumes from PDF/DOCX  
-✅ Understand and extract real technical skills (using GenAI)  
-✅ Estimate years of experience in each skill  
-✅ Match resumes to a job description (using vector similarity)  
-✅ Rank candidates with reasoning  
-✅ Ready for next step: auto-interview question generation
+- 🔍 Parse and understand candidate resumes (PDF/DOCX)
+- 🎯 Extract real technical skills using noun phrase filtering + Gemini
+- 📄 Parse job descriptions and extract required skills
+- 📊 Match candidates to JD using skill overlap
+- 🏆 Rank resumes by score out of 100
+- 📥 Present clean, recruiter-friendly output
 
----
-
-## 📌 Problem It Solves
-
-Recruiters and hiring managers often struggle with:
-- Reading 100s of resumes for one job
-- Missing qualified candidates due to keyword mismatch
-- Lack of insight on actual experience behind buzzwords
-
-This system solves that using AI-powered resume understanding.
+> ✅ This project is a **portfolio showcase** to demonstrate skills in **GenAI, RAG, NLP, and multi-agent reasoning**.
 
 ---
 
-## 🧠 How It Works – Workflow
+## 🚀 Features
 
-### Step-by-step pipeline:
-
-1. **Resume Parsing**  
-   - Reads PDF/DOCX files using `pdfplumber` and `docx2txt`  
-   - Extracts basic info: name, email, phone, experience section
-
-2. **Noun Phrase Extraction**  
-   - Uses `spaCy` to extract important **nouns and phrases** (potential skills)
-
-3. **Skill Extraction via GenAI**  
-   - Sends phrases + resume to **Gemini Pro** (LLM)  
-   - Gemini responds with structured JSON:
-     ```json
-     [
-       { "skill": "selenium", "experience": "4 years" },
-       { "skill": "rest api", "experience": "unknown" }
-     ]
-     ```
-
-4. **Similarity Scoring**  
-   - Loads the job description
-   - Embeds both resume and JD using `TF-IDF + Cosine Similarity`
-   - Scores each resume based on skill match and context
-
-5. **Ranking & Output**  
-   - All resumes are ranked based on relevance to the JD  
-   - Also prints skills with experience and explanation-ready phrases
+| Feature                               | Description |
+|--------------------------------------|-------------|
+| 🧠 GenAI Skill Extraction            | Uses Gemini to extract only real skills from resumes and JDs |
+| 📑 Resume Parsing                    | Parses both `.pdf` and `.docx` files |
+| 🧾 JD Understanding                  | Extracts technical skill keywords from job description |
+| ⚖️ Resume Ranking                    | Scores each resume out of 100 based on skill overlap |
+| 📈 Clean Output                      | Prints ranked candidate list with matched skills |
+| 🛡️ Modular Code Structure            | Organized, extensible components for future enhancements |
 
 ---
 
-## 🧱 Tech Stack
+## 🧠 How It Works (Workflow)
 
-| Tool | Purpose |
-|------|---------|
-| Python | Main development language |
-| pdfplumber, docx2txt | Resume parsing |
-| spaCy | NLP: noun phrase extraction |
-| Gemini (via `google-generativeai`) | GenAI for skill & experience extraction |
-| scikit-learn | TF-IDF + Cosine similarity |
-| dotenv | Environment variable management |
-| VS Code | IDE used |
+### Step-by-Step
+
+```
+          ┌─────────────┐
+          │ Job Description (JD) - Text File
+          └────┬────────┘
+               │
+     [Extract Noun Phrases using NLP]
+               ↓
+  [Gemini filters only technical skills]  ←─┐
+               ↓                          │
+     JD Skills Set (cleaned by LLM)       │
+                                          │
+      ┌───────────────────────────┐       │
+      │ Resume Folder (.pdf/.docx)│       │
+      └────────────┬──────────────┘       │
+                   │                      │
+       [Text extraction + noun phrases]   │
+                   ↓                      │
+     [Gemini extracts skills w/ exp]      │
+                   ↓                      │
+      Resume Skills → Compare to JD Skills
+                   ↓
+     Score = (Matched Skills / JD Skills) * 100
+                   ↓
+     Output: Ranked candidates with score
+```
+
+---
+
+## 🧾 Sample Output
+
+```
+JD Skills Required:
+java, selenium, postman, rest api, testng
+
+📝 Ranked Candidates:
+
+1. Rahul Gunjal
+   Matched Skills: java, selenium, rest api
+   Score: 60.0 / 100
+
+2. Arti Pisal
+   Matched Skills: java, testng
+   Score: 40.0 / 100
+```
 
 ---
 
 ## 📁 Project Structure
 
-```bash
+```
 smart_resume_screener/
 │
-├── data/                   # Input resumes & job description
-│   ├── resumes/            # PDF or DOCX resumes
-│   └── jd.txt              # Job description text
+├── data/
+│   ├── jd.txt                    # Job description
+│   └── resumes/                  # Folder with resumes (.pdf, .docx)
 │
-├── parsers/                # Resume & JD parsers
-│   ├── resume_parser.py
-│   └── jd_parser.py
+├── genai/
+│   └── skill_extractor.py       # Gemini-based skill extraction logic
 │
-├── embeddings/             # TF-IDF similarity logic
-│   └── embedder.py
+├── parsers/
+│   ├── resume_parser.py         # Resume reading + noun extraction
 │
-├── genai/                  # Gemini skill + experience extractor
-│   └── skill_extractor.py
+├── utils/
+│   └── nlp_utils.py             # Noun phrase extraction (NLTK)
 │
-├── utils/                  # NLP helper (noun phrase extractor)
-│   └── nlp_utils.py
-│
-├── .env                    # Contains your GEMINI_API_KEY (excluded via .gitignore)
-├── main.py                 # Main driver script
-├── requirements.txt        # Python dependencies
-└── README.md               # You're reading this!
+├── main.py                      # Entry point - ranking pipeline
+├── requirements.txt             # Cleaned dependencies
+└── .env                         # Contains GEMINI_API_KEY
+```
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the Repo
+
+```bash
+git clone https://github.com/your-username/smart_resume_screener.git
+cd smart_resume_screener
+```
+
+### 2. Create and Activate Virtual Environment
+
+```bash
+python -m venv venv
+venv\Scripts\activate   # On Windows
+```
+
+### 3. Install Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure `.env`
+
+Create a `.env` file and add your Gemini API Key:
+
+```
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+> You can get the key from https://makersuite.google.com/app/apikey
+
+### 5. Run the Project
+
+```bash
+python main.py
+```
+
+---
+
+## 📦 Dependencies Used
+
+```
+pdfplumber            → Parse PDF resumes  
+docx2txt              → Parse DOCX resumes  
+nltk                  → Extract noun phrases  
+google-generativeai   → Gemini integration  
+python-dotenv         → Load secrets from .env  
+pandas (optional)
+```
+
+---
+
+## 💡 Future Enhancements
+
+- 🔮 Generate personalized interview questions using Gemini
+- 📊 Streamlit or Flask Web UI for recruiters
+- 📁 Export output to Excel or CSV
+- 🔁 Add RAG/vector DB for more intelligent scoring
+- ☁️ Deploy as REST API for integration
+
+---
+
+## 🧑‍💻 Author
+
+**Rahul Gunjal**  
+[GitHub](https://github.com/rahulgunjal)
+
+---
