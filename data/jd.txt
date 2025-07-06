@@ -1,0 +1,31 @@
+Job Title: Automation Test Engineer  
+Experience Required: 3 to 5 Years  
+Location: Remote / Bangalore / Pune  
+Employment Type: Full-Time  
+
+Job Summary:  
+We are looking for a skilled Automation Test Engineer with around 4 years of hands-on experience in both Manual and Automation testing. The candidate should be proficient in Java-based test automation frameworks and API testing.
+
+Key Responsibilities:
+- Design and develop automated test scripts using Selenium WebDriver with Java
+- Write and maintain BDD test scenarios using Cucumber
+- Perform API testing using REST Assured and Postman
+- Collaborate with developers and product managers in Agile/Scrum teams
+- Execute regression and integration testing
+- Log defects and track them using Jira
+- Prepare test cases, test plans, and test reports
+
+Required Skills:
+- 4+ years of experience in software testing
+- Strong knowledge of **Selenium WebDriver**, **Java**, **TestNG**
+- Experience with **Cucumber**, **BDD**, and **Gherkin**
+- Hands-on experience with **REST API testing** using **REST Assured**
+- Familiarity with tools like **Git**, **Jira**, **Postman**
+- Good understanding of **Agile** methodology
+
+Nice to Have:
+- Knowledge of CI/CD tools like Jenkins
+- Basic knowledge of SQL and databases
+
+Education:
+- Bachelor’s Degree in Computer Science, IT, or related field
